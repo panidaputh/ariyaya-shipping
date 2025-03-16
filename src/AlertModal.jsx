@@ -16,9 +16,9 @@ const AlertModal = ({ isOpen, onClose, message }) => {
             <div className="bg-white rounded-lg shadow-xl transform transition-all max-w-md w-full mx-4 sm:mx-auto p-6 relative z-10">
                 <div className="text-center">
                     {/* Warning icon */}
-                    <div className="mx-auto flex items-center justify-center h-10 w-10 rounded-full bg-red-100 mb-4">
+                    <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-red-100 mb-4">
                         <svg
-                            className="h-5 w-5 text-red-600"
+                            className="h-10 w-10 text-red-600"
                             fill="none"
                             stroke="currentColor"
                             viewBox="0 0 24 24"
