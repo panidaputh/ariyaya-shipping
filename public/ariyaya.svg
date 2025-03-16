@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="400" height="300" viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg">
+    <!-- Background -->
+    <rect width="400" height="300" fill="pink" />
+    
+    <!-- Truck Icon -->
+    <rect x="50" y="150" width="200" height="80" rx="10" fill="red" />
+    <rect x="200" y="170" width="80" height="60" rx="10" fill="darkred" />
+    <circle cx="100" cy="240" r="20" fill="white" stroke="red" stroke-width="5" />
+    <circle cx="220" cy="240" r="20" fill="white" stroke="red" stroke-width="5" />
+    
+    <!-- Arrow (China to Thailand) -->
+    <polygon points="270,120 320,150 270,180" fill="red" />
+    <rect x="150" y="145" width="130" height="10" fill="red" />
+    
+    <!-- Text -->
+    <text x="50" y="50" font-size="24" fill="darkred" font-family="Arial, sans-serif" font-weight="bold">
+        คำนวณค่าขนส่ง จีน - ไทย
+    </text>
+    
+    <!-- AriyayaPreorder Icon -->
+    <circle cx="350" cy="50" r="30" fill="red" stroke="white" stroke-width="3" />
+    <text x="330" y="60" font-size="16" fill="white" font-family="Arial, sans-serif" font-weight="bold">
+        AP
+    </text>
+</svg>
