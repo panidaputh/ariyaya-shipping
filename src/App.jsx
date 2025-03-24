@@ -3,7 +3,7 @@ import { useState } from "react";
 import AlertModal from "./AlertModal";
 
 function App() {
-  const [activeTab, setActiveTab] = useState("company");
+  const [calculationType, setCalculationType] = useState("company");
   const [dimensions, setDimensions] = useState({
     width: "",
     length: "",
@@ -26,7 +26,6 @@ function App() {
     setModalMessage(message);
     setModalOpen(true);
   };
-
 
   const clearForm = () => {
     // Reset all form state
@@ -87,11 +86,6 @@ function App() {
     },
   };
 
-  const handleTabChange = (tab) => {
-    setActiveTab(tab);
-    setCalculationResult(null); // Reset calculation result when changing tabs
-  };
-
   const handleDimensionChange = (dimension, value) => {
     setDimensions({ ...dimensions, [dimension]: value });
   };
@@ -115,7 +109,7 @@ function App() {
 
     let rates;
 
-    if (activeTab === "company") {
+    if (calculationType === "company") {
       // Get rates from company pricing table
       rates = pricingRates[customerLevel][shippingMethod][productType];
     } else {
@@ -138,37 +132,36 @@ function App() {
     const volumeWeight = (width * length * height) / 5000;
 
     let shippingCost = 0;
-    let calculationType = "";
+    let calcType = ""; // เปลี่ยนชื่อตัวแปรเพื่อไม่ให้ชนกับ state calculationType
 
     // Determine which calculation to use
     if (volumeWeight < weightValue) {
       // Use actual weight calculation
       shippingCost = weightValue * rates.perKg;
-      calculationType = "weight";
+      calcType = "weight";
     } else {
       // Use volume calculation
       const cubicMeters = (width * length * height) / 1000000;
       shippingCost = cubicMeters * rates.perCbm;
-      calculationType = "volume";
+      calcType = "volume";
     }
 
     setCalculationResult({
       volumeWeight,
       actualWeight: weightValue,
       shippingCost: parseFloat(shippingCost.toFixed(2)),
-      calculationType,
+      calculationType: calcType, // ใช้ตัวแปรใหม่
       dimensions: { width, length, height },
-      customerLevel: activeTab === "company" ? customerLevel : "N/A",
-      productType: activeTab === "company" ? productType : "N/A",
-      shippingMethod: activeTab === "company" ? shippingMethod : "N/A",
+      customerLevel: calculationType === "company" ? customerLevel : "N/A",
+      productType: calculationType === "company" ? productType : "N/A",
+      shippingMethod: calculationType === "company" ? shippingMethod : "N/A",
       rates,
-      isCustomRate: activeTab === "other",
+      isCustomRate: calculationType === "custom",
     });
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-purple-100 to-pink-100 p-2 sm:p-4 md:p-6 font-sans">
-
       {/* ต้องใส่ AlertModal component ตรงนี้ */}
       <AlertModal
         isOpen={modalOpen}
@@ -178,30 +171,8 @@ function App() {
 
       <div className="max-w-4xl mx-auto bg-white rounded-xl shadow-xl p-4 sm:p-6 md:p-8">
         <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-6 md:mb-8 bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-pink-600">
-          คำนวณค่าขนส่งจีน-ไทย
+          คำนวณค่าขนส่งจีน-ไทย AriyayaPreorder
         </h1>
-
-        {/* Tabs - improved with better touch targets */}
-        <div className="flex mb-6 md:mb-8 border-b overflow-x-auto">
-          <div
-            className={`px-4 sm:px-6 py-3 cursor-pointer text-base sm:text-lg font-medium transition-colors ${activeTab === "company"
-              ? "border-b-2 border-purple-600 text-purple-600"
-              : "text-gray-500 hover:text-purple-500"
-              }`}
-            onClick={() => handleTabChange("company")}
-          >
-            ค่าขนส่งจีน-ไทยของบริษัท
-          </div>
-          <div
-            className={`px-4 sm:px-6 py-3 cursor-pointer text-base sm:text-lg font-medium transition-colors ${activeTab === "other"
-              ? "border-b-2 border-purple-600 text-purple-600"
-              : "text-gray-500 hover:text-purple-500"
-              }`}
-            onClick={() => handleTabChange("other")}
-          >
-            อื่นๆ
-          </div>
-        </div>
 
         {/* Dimension inputs - revised layout for better responsiveness */}
         <div className="bg-gray-50 p-4 sm:p-6 rounded-lg mb-6 sm:mb-8 shadow-sm">
@@ -254,156 +225,187 @@ function App() {
               className="w-full p-2 sm:p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-300 focus:border-purple-500 outline-none transition-all"
               placeholder="น้ำหนัก"
               value={weight}
-              onChange={(e) => setWeight(e.target.value)}
+              onChange={(e) => {
+                const value = e.target.value;
+                
+                // อนุญาตให้เป็นค่าว่างได้
+                if (value === '') {
+                  setWeight('');
+                  return;
+                }
+
+                // จำกัดทศนิยมไม่เกิน 2 ตำแหน่ง
+                if (value.includes('.') && value.split('.')[1].length > 2) {
+                  return;
+                }
+
+                // ตรวจสอบว่าเป็นตัวเลขที่ถูกต้อง
+                const numValue = parseFloat(value);
+                if (!isNaN(numValue)) {
+                  setWeight(value);
+                }
+              }}
+              onBlur={(e) => {
+                // จัดรูปแบบทศนิยมเมื่อออกจากช่อง
+                if (weight && weight.includes('.')) {
+                  setWeight(parseFloat(weight).toFixed(2));
+                }
+              }}
+              step="0.01"
             />
           </div>
         </div>
 
-        {/* Different content based on active tab */}
-        {activeTab === "company" ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
-            {/* Customer level */}
-            <div className="bg-gray-50 p-4 sm:p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow">
-              <h3 className="text-base sm:text-lg font-semibold mb-4 text-gray-800">
-                <span className="inline-block mr-2">👤</span>ระดับของลูกค้า
+        {/* เปลี่ยนส่วนเลือกรูปแบบการคำนวณจาก dropdown เป็น radio */}
+        <div className="bg-gray-50 p-4 sm:p-6 rounded-lg mb-6 shadow-sm">
+          <h2 className="text-lg sm:text-xl font-semibold mb-4 text-gray-800">
+            <span className="inline-block mr-2">🔄</span>รูปแบบการคำนวณ
+          </h2>
+          <div className="flex flex-col sm:flex-row gap-4">
+            <label className="flex items-center space-x-2 cursor-pointer">
+              <input
+                type="radio"
+                value="company"
+                checked={calculationType === "company"}
+                onChange={(e) => setCalculationType(e.target.value)}
+                className="w-4 h-4 text-purple-600 border-gray-300 focus:ring-purple-500"
+              />
+              <span className="text-gray-700">คำนวณด้วยเรทของบริษัท</span>
+            </label>
+            <label className="flex items-center space-x-2 cursor-pointer">
+              <input
+                type="radio"
+                value="custom"
+                checked={calculationType === "custom"}
+                onChange={(e) => setCalculationType(e.target.value)}
+                className="w-4 h-4 text-purple-600 border-gray-300 focus:ring-purple-500"
+              />
+              <span className="text-gray-700">คำนวณด้วยเรทที่กำหนดเอง</span>
+            </label>
+          </div>
+        </div>
+
+        {/* แสดงทั้งสองส่วนพร้อมกัน */}
+        <div className="grid grid-cols-1 gap-6 mb-6">
+          {/* ส่วนคำนวณด้วยเรทของบริษัท */}
+          <div
+            className={`${
+              calculationType === "custom"
+                ? "opacity-50 pointer-events-none"
+                : ""
+            }`}
+          >
+            <div className="bg-gray-50 p-4 sm:p-6 rounded-lg shadow-sm">
+              <h3 className="text-lg font-semibold mb-4 text-gray-800">
+                <span className="inline-block mr-2">🏢</span>
+                ข้อมูลการคำนวณด้วยเรทของบริษัท
               </h3>
-              <select
-                className="w-full p-2 sm:p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-300 focus:border-purple-500 outline-none bg-white cursor-pointer"
-                value={customerLevel}
-                onChange={(e) => setCustomerLevel(e.target.value)}
-              >
-                <option value="Silver Rabbit">Silver Rabbit</option>
-                <option value="Diamond Rabbit">Diamond Rabbit</option>
-                <option value="Star Rabbit">Star Rabbit</option>
-              </select>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                {/* Customer level */}
+                <div>
+                  <label className="text-base font-medium text-gray-700 block mb-2">
+                    <span className="inline-block mr-2">👤</span>ระดับของลูกค้า
+                  </label>
+                  <select
+                    className="w-full p-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-300 focus:border-purple-500 outline-none bg-white"
+                    value={customerLevel}
+                    onChange={(e) => setCustomerLevel(e.target.value)}
+                    disabled={calculationType === "custom"}
+                  >
+                    <option value="Silver Rabbit">Silver Rabbit</option>
+                    <option value="Diamond Rabbit">Diamond Rabbit</option>
+                    <option value="Star Rabbit">Star Rabbit</option>
+                  </select>
+                </div>
 
-              {/* Pricing info */}
-              <div className="mt-4 text-sm text-gray-600 bg-white p-2 rounded-md">
-                <p className="font-medium">อัตราค่าบริการ:</p>
-                {customerLevel === "Silver Rabbit" && (
-                  <p className="flex items-center">
-                    <span className="inline-block w-3 h-3 rounded-full bg-gray-400 mr-2"></span>
-                    Silver Rabbit (มาตรฐาน)
-                  </p>
-                )}
-                {customerLevel === "Diamond Rabbit" && (
-                  <p className="flex items-center">
-                    <span className="inline-block w-3 h-3 rounded-full bg-blue-400 mr-2"></span>
-                    Diamond Rabbit (ลูกค้าประจำ)
-                  </p>
-                )}
-                {customerLevel === "Star Rabbit" && (
-                  <p className="flex items-center">
-                    <span className="inline-block w-3 h-3 rounded-full bg-yellow-400 mr-2"></span>
-                    Star Rabbit (ลูกค้า VIP)
-                  </p>
-                )}
-              </div>
-            </div>
+                {/* Product type */}
+                <div>
+                  <label className="text-base font-medium text-gray-700 block mb-2">
+                    <span className="inline-block mr-2">🏷️</span>ประเภทสินค้า
+                  </label>
+                  <select
+                    className="w-full p-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-300 focus:border-purple-500 outline-none bg-white"
+                    value={productType}
+                    onChange={(e) => setProductType(e.target.value)}
+                    disabled={calculationType === "custom"}
+                  >
+                    <option value="สินค้าทั่วไป">สินค้าทั่วไป</option>
+                    <option value="สินค้าประเภทที่ 1,2">
+                      สินค้าประเภทที่ 1,2
+                    </option>
+                    <option value="สินค้าพิเศษ">สินค้าพิเศษ</option>
+                  </select>
+                </div>
 
-            {/* Product type */}
-            <div className="bg-gray-50 p-4 sm:p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow">
-              <h3 className="text-base sm:text-lg font-semibold mb-4 text-gray-800">
-                <span className="inline-block mr-2">🏷️</span>ประเภทสินค้า
-              </h3>
-              <select
-                className="w-full p-2 sm:p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-300 focus:border-purple-500 outline-none bg-white cursor-pointer"
-                value={productType}
-                onChange={(e) => setProductType(e.target.value)}
-              >
-                <option value="สินค้าทั่วไป">สินค้าทั่วไป</option>
-                <option value="สินค้าประเภทที่ 1,2">สินค้าประเภทที่ 1,2</option>
-                <option value="สินค้าพิเศษ">สินค้าพิเศษ</option>
-              </select>
-
-              {/* Pricing info */}
-              <div className="mt-4 text-sm text-gray-600 bg-white p-2 rounded-md">
-                <p className="font-medium">
-                  อัตราค่าบริการ{" "}
-                  {shippingMethod === "ทางเรือ" ? "ทางเรือ" : "ทางรถ"}:
-                </p>
-                <p>
-                  {
-                    pricingRates[customerLevel][shippingMethod][productType]
-                      .perKg
-                  }{" "}
-                  บาท/กก.,{" "}
-                  {
-                    pricingRates[customerLevel][shippingMethod][productType]
-                      .perCbm
-                  }{" "}
-                  บาท/คิว
-                </p>
-              </div>
-            </div>
-
-            {/* Shipping method */}
-            <div className="bg-gray-50 p-4 sm:p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow">
-              <h3 className="text-base sm:text-lg font-semibold mb-4 text-gray-800">
-                <span className="inline-block mr-2">🚢</span>การขนส่ง
-              </h3>
-              <select
-                className="w-full p-2 sm:p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-300 focus:border-purple-500 outline-none bg-white cursor-pointer"
-                value={shippingMethod}
-                onChange={(e) => setShippingMethod(e.target.value)}
-              >
-                <option value="ทางเรือ">ทางเรือ</option>
-                <option value="ทางรถ">ทางรถ</option>
-              </select>
-              {/* Shipping info */}
-              <div className="mt-4 text-sm text-gray-600 bg-white p-2 rounded-md">
-                <p className="font-medium">รายละเอียดการขนส่ง:</p>
-                {shippingMethod === "ทางเรือ" && (
-                  <p className="flex items-center">
-                    <span className="inline-block w-3 h-3 rounded-full bg-blue-400 mr-2"></span>
-                    ทางเรือ (ใช้เวลา 10-15 วัน)
-                  </p>
-                )}
-                {shippingMethod === "ทางรถ" && (
-                  <p className="flex items-center">
-                    <span className="inline-block w-3 h-3 rounded-full bg-green-400 mr-2"></span>
-                    ทางรถ (ใช้เวลา 5-7 วัน, ค่าบริการสูงกว่า)
-                  </p>
-                )}
+                {/* Shipping method */}
+                <div>
+                  <label className="text-base font-medium text-gray-700 block mb-2">
+                    <span className="inline-block mr-2">🚢</span>การขนส่ง
+                  </label>
+                  <select
+                    className="w-full p-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-300 focus:border-purple-500 outline-none bg-white"
+                    value={shippingMethod}
+                    onChange={(e) => setShippingMethod(e.target.value)}
+                    disabled={calculationType === "custom"}
+                  >
+                    <option value="ทางเรือ">ทางเรือ</option>
+                    <option value="ทางรถ">ทางรถ</option>
+                  </select>
+                </div>
               </div>
             </div>
           </div>
-        ) : (
-          // Custom rates section for "อื่นๆ" tab
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8">
-            {/* Per kg rate */}
-            <div className="bg-gray-50 p-4 sm:p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow">
-              <h3 className="text-base sm:text-lg font-semibold mb-4 text-gray-800">
-                <span className="inline-block mr-2">⚖️</span>เรทค่าขนส่ง : กก.
-              </h3>
-              <input
-                type="number"
-                className="w-full p-2 sm:p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-300 focus:border-purple-500 outline-none transition-all"
-                placeholder="บาท/กก."
-                value={customRates.perKg}
-                onChange={(e) =>
-                  handleCustomRateChange("perKg", e.target.value)
-                }
-              />
-            </div>
 
-            {/* Per cubic meter rate */}
-            <div className="bg-gray-50 p-4 sm:p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow">
-              <h3 className="text-base sm:text-lg font-semibold mb-4 text-gray-800">
-                <span className="inline-block mr-2">📊</span>เรทค่าขนส่ง : คิว
+          {/* ส่วนคำนวณด้วยเรทที่กำหนดเอง */}
+          <div
+            className={`${
+              calculationType === "company"
+                ? "opacity-50 pointer-events-none"
+                : ""
+            }`}
+          >
+            <div className="bg-gray-50 p-4 sm:p-6 rounded-lg shadow-sm">
+              <h3 className="text-lg font-semibold mb-4 text-gray-800">
+                <span className="inline-block mr-2">📝</span>
+                ข้อมูลการคำนวณด้วยเรทที่กำหนดเอง
               </h3>
-              <input
-                type="number"
-                className="w-full p-2 sm:p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-300 focus:border-purple-500 outline-none transition-all"
-                placeholder="บาท/คิว"
-                value={customRates.perCbm}
-                onChange={(e) =>
-                  handleCustomRateChange("perCbm", e.target.value)
-                }
-              />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-base font-medium text-gray-700 block mb-2">
+                    <span className="inline-block mr-2">⚖️</span>เรทค่าขนส่ง :
+                    กก.
+                  </label>
+                  <input
+                    type="number"
+                    className="w-full p-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-300 focus:border-purple-500 outline-none"
+                    placeholder="บาท/กก."
+                    value={customRates.perKg}
+                    onChange={(e) =>
+                      handleCustomRateChange("perKg", e.target.value)
+                    }
+                    disabled={calculationType === "company"}
+                  />
+                </div>
+                <div>
+                  <label className="text-base font-medium text-gray-700 block mb-2">
+                    <span className="inline-block mr-2">📊</span>เรทค่าขนส่ง :
+                    คิว
+                  </label>
+                  <input
+                    type="number"
+                    className="w-full p-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-300 focus:border-purple-500 outline-none"
+                    placeholder="บาท/คิว"
+                    value={customRates.perCbm}
+                    onChange={(e) =>
+                      handleCustomRateChange("perCbm", e.target.value)
+                    }
+                    disabled={calculationType === "company"}
+                  />
+                </div>
+              </div>
             </div>
           </div>
-        )}
+        </div>
 
         {/* Calculate and Clear buttons */}
         <div className="flex justify-center gap-4 mb-6 sm:mb-8">
@@ -785,7 +787,7 @@ function App() {
                   d="M9 5l7 7-7 7"
                 ></path>
               </svg>
-              <span>น้ำหนักตามปริมาตร คำนวณจาก (กว้าง × ยาว × สูง) ÷ 5000</span>
+              <span>คำนวณจาก (กว้าง × ยาว × สูง) ÷ 10000</span>
             </li>
             <li className="flex items-start">
               <svg
