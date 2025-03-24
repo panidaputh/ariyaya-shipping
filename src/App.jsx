@@ -138,6 +138,9 @@ function App() {
     if (volumeWeight < weightValue) {
       // Use actual weight calculation
       shippingCost = weightValue * rates.perKg;
+      if (weightValue <= 1) {
+        shippingCost = rates.perKg;
+      }
       calcType = "weight";
     } else {
       // Use volume calculation
@@ -161,22 +164,21 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-purple-100 to-pink-100 p-2 sm:p-4 md:p-6 font-sans">
-      {/* ต้องใส่ AlertModal component ตรงนี้ */}
+    <div className="min-h-screen bg-gradient-to-br from-rose-50 via-pink-50 to-rose-100 p-2 sm:p-4 md:p-6 font-sans">
       <AlertModal
         isOpen={modalOpen}
         onClose={() => setModalOpen(false)}
         message={modalMessage}
       />
 
-      <div className="max-w-4xl mx-auto bg-white rounded-xl shadow-xl p-4 sm:p-6 md:p-8">
-        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-6 md:mb-8 bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-pink-600">
+      <div className="max-w-4xl mx-auto bg-white/80 backdrop-blur-sm rounded-2xl shadow-2xl p-4 sm:p-6 md:p-8 border border-rose-100">
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-6 md:mb-8 bg-clip-text text-transparent bg-gradient-to-r from-rose-600 to-pink-600">
           คำนวณค่าขนส่งจีน-ไทย AriyayaPreorder
         </h1>
 
         {/* Dimension inputs - revised layout for better responsiveness */}
-        <div className="bg-gray-50 p-4 sm:p-6 rounded-lg mb-6 sm:mb-8 shadow-sm">
-          <h2 className="text-lg sm:text-xl font-semibold mb-4 text-gray-800">
+        <div className="bg-white/60 backdrop-blur-sm p-4 sm:p-6 rounded-xl mb-6 shadow-lg border border-rose-100">
+          <h2 className="text-lg sm:text-xl font-semibold mb-4 text-rose-800">
             <span className="inline-block mr-2">📦</span>ข้อมูลสินค้า
           </h2>
 
@@ -188,30 +190,26 @@ function App() {
             <div className="flex flex-wrap items-center gap-2 mb-4">
               <input
                 type="number"
-                className="flex-1 min-w-[80px] p-2 sm:p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-300 focus:border-purple-500 outline-none transition-all"
+                className="flex-1 min-w-[80px] p-2 sm:p-3 rounded-lg border border-rose-200 focus:ring-2 focus:ring-rose-300 focus:border-rose-500 outline-none transition-all"
                 placeholder="กว้าง"
                 value={dimensions.width}
                 onChange={(e) => handleDimensionChange("width", e.target.value)}
               />
-              <span className="text-gray-600">*</span>
+              <span className="text-rose-600 font-bold">×</span>
               <input
                 type="number"
-                className="flex-1 min-w-[80px] p-2 sm:p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-300 focus:border-purple-500 outline-none transition-all"
+                className="flex-1 min-w-[80px] p-2 sm:p-3 rounded-lg border border-rose-200 focus:ring-2 focus:ring-rose-300 focus:border-rose-500 outline-none transition-all"
                 placeholder="ยาว"
                 value={dimensions.length}
-                onChange={(e) =>
-                  handleDimensionChange("length", e.target.value)
-                }
+                onChange={(e) => handleDimensionChange("length", e.target.value)}
               />
-              <span className="text-gray-600">*</span>
+              <span className="text-rose-600 font-bold">×</span>
               <input
                 type="number"
-                className="flex-1 min-w-[80px] p-2 sm:p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-300 focus:border-purple-500 outline-none transition-all"
+                className="flex-1 min-w-[80px] p-2 sm:p-3 rounded-lg border border-rose-200 focus:ring-2 focus:ring-rose-300 focus:border-rose-500 outline-none transition-all"
                 placeholder="สูง"
                 value={dimensions.height}
-                onChange={(e) =>
-                  handleDimensionChange("height", e.target.value)
-                }
+                onChange={(e) => handleDimensionChange("height", e.target.value)}
               />
             </div>
           </div>
@@ -222,63 +220,37 @@ function App() {
             </label>
             <input
               type="number"
-              className="w-full p-2 sm:p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-300 focus:border-purple-500 outline-none transition-all"
+              className="w-full p-2 sm:p-3 rounded-lg border border-rose-200 focus:ring-2 focus:ring-rose-300 focus:border-rose-500 outline-none transition-all"
               placeholder="น้ำหนัก"
               value={weight}
-              onChange={(e) => {
-                const value = e.target.value;
-                
-                // อนุญาตให้เป็นค่าว่างได้
-                if (value === '') {
-                  setWeight('');
-                  return;
-                }
-
-                // จำกัดทศนิยมไม่เกิน 2 ตำแหน่ง
-                if (value.includes('.') && value.split('.')[1].length > 2) {
-                  return;
-                }
-
-                // ตรวจสอบว่าเป็นตัวเลขที่ถูกต้อง
-                const numValue = parseFloat(value);
-                if (!isNaN(numValue)) {
-                  setWeight(value);
-                }
-              }}
-              onBlur={(e) => {
-                // จัดรูปแบบทศนิยมเมื่อออกจากช่อง
-                if (weight && weight.includes('.')) {
-                  setWeight(parseFloat(weight).toFixed(2));
-                }
-              }}
-              step="0.01"
+              onChange={(e) => setWeight(e.target.value)}
             />
           </div>
         </div>
 
         {/* เปลี่ยนส่วนเลือกรูปแบบการคำนวณจาก dropdown เป็น radio */}
-        <div className="bg-gray-50 p-4 sm:p-6 rounded-lg mb-6 shadow-sm">
-          <h2 className="text-lg sm:text-xl font-semibold mb-4 text-gray-800">
+        <div className="bg-white/60 backdrop-blur-sm p-4 sm:p-6 rounded-xl mb-6 shadow-lg border border-rose-100">
+          <h2 className="text-lg sm:text-xl font-semibold mb-4 text-rose-800">
             <span className="inline-block mr-2">🔄</span>รูปแบบการคำนวณ
           </h2>
           <div className="flex flex-col sm:flex-row gap-4">
-            <label className="flex items-center space-x-2 cursor-pointer">
+            <label className="flex items-center space-x-2 cursor-pointer p-3 rounded-lg hover:bg-rose-50 transition-colors">
               <input
                 type="radio"
                 value="company"
                 checked={calculationType === "company"}
                 onChange={(e) => setCalculationType(e.target.value)}
-                className="w-4 h-4 text-purple-600 border-gray-300 focus:ring-purple-500"
+                className="w-4 h-4 text-rose-600 border-rose-300 focus:ring-rose-500"
               />
               <span className="text-gray-700">คำนวณด้วยเรทของบริษัท</span>
             </label>
-            <label className="flex items-center space-x-2 cursor-pointer">
+            <label className="flex items-center space-x-2 cursor-pointer p-3 rounded-lg hover:bg-rose-50 transition-colors">
               <input
                 type="radio"
                 value="custom"
                 checked={calculationType === "custom"}
                 onChange={(e) => setCalculationType(e.target.value)}
-                className="w-4 h-4 text-purple-600 border-gray-300 focus:ring-purple-500"
+                className="w-4 h-4 text-rose-600 border-rose-300 focus:ring-rose-500"
               />
               <span className="text-gray-700">คำนวณด้วยเรทที่กำหนดเอง</span>
             </label>
@@ -410,7 +382,7 @@ function App() {
         {/* Calculate and Clear buttons */}
         <div className="flex justify-center gap-4 mb-6 sm:mb-8">
           <button
-            className="relative overflow-hidden bg-gradient-to-r from-purple-600 to-pink-500 text-white py-3 sm:py-4 px-8 sm:px-16 rounded-lg text-base sm:text-lg font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all focus:outline-none focus:ring-2 focus:ring-purple-300 group"
+            className="relative overflow-hidden bg-gradient-to-r from-rose-600 to-pink-600 text-white py-3 sm:py-4 px-8 sm:px-16 rounded-lg text-base sm:text-lg font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all focus:outline-none focus:ring-2 focus:ring-rose-300 group"
             onClick={handleCalculate}
           >
             <span className="absolute w-full h-full top-0 left-0 bg-white opacity-0 group-hover:opacity-20 transition-opacity"></span>
@@ -438,7 +410,7 @@ function App() {
           </button>
 
           <button
-            className="relative overflow-hidden bg-gray-200 text-gray-700 py-3 sm:py-4 px-8 sm:px-16 rounded-lg text-base sm:text-lg font-medium shadow-lg hover:shadow-xl hover:bg-gray-300 transform hover:-translate-y-1 transition-all focus:outline-none focus:ring-2 focus:ring-gray-300 group"
+            className="relative overflow-hidden bg-gray-100 text-gray-700 py-3 sm:py-4 px-8 sm:px-16 rounded-lg text-base sm:text-lg font-medium shadow-lg hover:shadow-xl hover:bg-gray-200 transform hover:-translate-y-1 transition-all focus:outline-none focus:ring-2 focus:ring-gray-300 group"
             onClick={clearForm}
           >
             <span className="absolute w-full h-full top-0 left-0 bg-white opacity-0 group-hover:opacity-20 transition-opacity"></span>
@@ -464,8 +436,8 @@ function App() {
 
         {/* Shipping rates display - improved visuals and mobile responsive */}
         {calculationResult && (
-          <div className="bg-gradient-to-r from-purple-50 to-pink-50 p-4 sm:p-6 rounded-lg shadow-md border border-purple-100">
-            <h3 className="text-xl font-bold mb-4 text-center text-purple-800 flex items-center justify-center">
+          <div className="bg-gradient-to-br from-rose-50 to-pink-50 p-4 sm:p-6 rounded-xl shadow-lg border border-rose-100">
+            <h3 className="text-xl font-bold mb-4 text-center text-rose-800 flex items-center justify-center">
               <svg
                 className="w-6 h-6 mr-2"
                 fill="none"
@@ -485,96 +457,50 @@ function App() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
               <div className="space-y-2">
-                <div className="mb-2 bg-white p-3 rounded-md shadow-sm hover:shadow-md transition-shadow">
-                  <span className="font-medium text-gray-700 flex items-center">
-                    <svg
-                      className="w-4 h-4 mr-2"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"
-                      ></path>
+                <div className="bg-white/80 backdrop-blur-sm p-3 rounded-lg shadow-sm hover:shadow-md transition-all transform hover:-translate-y-0.5 border border-rose-100">
+                  <span className="font-medium text-rose-700 flex items-center">
+                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/>
                     </svg>
                     ขนาด:
-                  </span>{" "}
-                  <span className="text-gray-800">
-                    {calculationResult.dimensions.width} ×{" "}
-                    {calculationResult.dimensions.length} ×{" "}
-                    {calculationResult.dimensions.height} ซม.
+                  </span>
+                  <span className="text-gray-800 ml-6">
+                    {calculationResult.dimensions.width} × {calculationResult.dimensions.length} × {calculationResult.dimensions.height} ซม.
                   </span>
                 </div>
 
-                <div className="mb-2 bg-white p-3 rounded-md shadow-sm hover:shadow-md transition-shadow">
-                  <span className="font-medium text-gray-700 flex items-center">
-                    <svg
-                      className="w-4 h-4 mr-2"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"
-                      ></path>
+                <div className="bg-white/80 backdrop-blur-sm p-3 rounded-lg shadow-sm hover:shadow-md transition-all transform hover:-translate-y-0.5 border border-rose-100">
+                  <span className="font-medium text-rose-700 flex items-center">
+                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3" />
                     </svg>
                     น้ำหนัก:
-                  </span>{" "}
-                  <span className="text-gray-800 font-medium">
+                  </span>
+                  <span className="text-gray-800 ml-6">
                     {calculationResult.actualWeight} กก.
                   </span>
                 </div>
 
-                <div className="mb-2 bg-white p-3 rounded-md shadow-sm hover:shadow-md transition-shadow">
-                  <span className="font-medium text-gray-700 flex items-center">
-                    <svg
-                      className="w-4 h-4 mr-2"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
-                      ></path>
+                <div className="bg-white/80 backdrop-blur-sm p-3 rounded-lg shadow-sm hover:shadow-md transition-all transform hover:-translate-y-0.5 border border-rose-100">
+                  <span className="font-medium text-rose-700 flex items-center">
+                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
                     </svg>
                     น้ำหนักตามปริมาตร:
-                  </span>{" "}
-                  <span className="text-gray-800">
+                  </span>
+                  <span className="text-gray-800 ml-6">
                     {calculationResult.volumeWeight.toFixed(2)} กก.
                   </span>
                 </div>
 
-                <div className="mb-2 bg-white p-3 rounded-md shadow-sm hover:shadow-md transition-shadow">
-                  <span className="font-medium text-gray-700 flex items-center">
-                    <svg
-                      className="w-4 h-4 mr-2"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"
-                      ></path>
+                <div className="bg-white/80 backdrop-blur-sm p-3 rounded-lg shadow-sm hover:shadow-md transition-all transform hover:-translate-y-0.5 border border-rose-100">
+                  <span className="font-medium text-rose-700 flex items-center">
+                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
                     </svg>
                     วิธีการคิดราคา:
-                  </span>{" "}
-                  <span className="text-gray-800">
+                  </span>
+                  <span className="text-gray-800 ml-6">
                     {calculationResult.calculationType === "weight"
                       ? "คำนวณจากน้ำหนัก"
                       : "คำนวณจากปริมาตร"}
@@ -585,125 +511,65 @@ function App() {
               <div className="space-y-2">
                 {!calculationResult.isCustomRate ? (
                   <>
-                    <div className="mb-2 bg-white p-3 rounded-md shadow-sm hover:shadow-md transition-shadow">
-                      <span className="font-medium text-gray-700 flex items-center">
-                        <svg
-                          className="w-4 h-4 mr-2"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="2"
-                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                          ></path>
+                    <div className="bg-white/80 backdrop-blur-sm p-3 rounded-lg shadow-sm hover:shadow-md transition-all transform hover:-translate-y-0.5 border border-rose-100">
+                      <span className="font-medium text-rose-700 flex items-center">
+                        <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                         </svg>
                         ระดับลูกค้า:
-                      </span>{" "}
-                      <span className="text-gray-800">
+                      </span>
+                      <span className="text-gray-800 ml-6">
                         {calculationResult.customerLevel}
                       </span>
                     </div>
 
-                    <div className="mb-2 bg-white p-3 rounded-md shadow-sm hover:shadow-md transition-shadow">
-                      <span className="font-medium text-gray-700 flex items-center">
-                        <svg
-                          className="w-4 h-4 mr-2"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="2"
-                            d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
-                          ></path>
+                    <div className="bg-white/80 backdrop-blur-sm p-3 rounded-lg shadow-sm hover:shadow-md transition-all transform hover:-translate-y-0.5 border border-rose-100">
+                      <span className="font-medium text-rose-700 flex items-center">
+                        <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
                         </svg>
                         ประเภทสินค้า:
-                      </span>{" "}
-                      <span className="text-gray-800">
+                      </span>
+                      <span className="text-gray-800 ml-6">
                         {calculationResult.productType}
                       </span>
                     </div>
 
-                    <div className="mb-2 bg-white p-3 rounded-md shadow-sm hover:shadow-md transition-shadow">
-                      <span className="font-medium text-gray-700 flex items-center">
-                        <svg
-                          className="w-4 h-4 mr-2"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="2"
-                            d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"
-                          ></path>
+                    <div className="bg-white/80 backdrop-blur-sm p-3 rounded-lg shadow-sm hover:shadow-md transition-all transform hover:-translate-y-0.5 border border-rose-100">
+                      <span className="font-medium text-rose-700 flex items-center">
+                        <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
                         </svg>
                         วิธีการขนส่ง:
-                      </span>{" "}
-                      <span className="text-gray-800">
+                      </span>
+                      <span className="text-gray-800 ml-6">
                         {calculationResult.shippingMethod}
                       </span>
                     </div>
                   </>
                 ) : (
-                  <div className="mb-2 bg-white p-3 rounded-md shadow-sm hover:shadow-md transition-shadow">
-                    <span className="font-medium text-gray-700 flex items-center">
-                      <svg
-                        className="w-4 h-4 mr-2"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
-                        ></path>
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                        ></path>
+                  <div className="bg-white/80 backdrop-blur-sm p-3 rounded-lg shadow-sm hover:shadow-md transition-all transform hover:-translate-y-0.5 border border-rose-100">
+                    <span className="font-medium text-rose-700 flex items-center">
+                      <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                       </svg>
                       ประเภทการคำนวณ:
-                    </span>{" "}
-                    <span className="text-gray-800">
+                    </span>
+                    <span className="text-gray-800 ml-6">
                       คำนวณด้วยอัตราที่กำหนดเอง
                     </span>
                   </div>
                 )}
 
-                <div className="mb-2 bg-white p-3 rounded-md shadow-sm hover:shadow-md transition-shadow">
-                  <span className="font-medium text-gray-700 flex items-center">
-                    <svg
-                      className="w-4 h-4 mr-2"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                      ></path>
+                <div className="bg-white/80 backdrop-blur-sm p-3 rounded-lg shadow-sm hover:shadow-md transition-all transform hover:-translate-y-0.5 border border-rose-100">
+                  <span className="font-medium text-rose-700 flex items-center">
+                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                     อัตราค่าขนส่ง:
-                  </span>{" "}
-                  <span className="text-gray-800">
+                  </span>
+                  <span className="text-gray-800 ml-6">
                     {calculationResult.rates.perKg} บาท/กก. หรือ{" "}
                     {calculationResult.rates.perCbm} บาท/คิว
                   </span>
@@ -711,10 +577,10 @@ function App() {
               </div>
             </div>
 
-            <div className="mt-6 bg-gradient-to-r from-purple-100 to-pink-100 p-4 rounded-lg text-center shadow-inner">
-              <div className="text-xl sm:text-2xl font-bold text-purple-800">
+            <div className="mt-6 bg-gradient-to-r from-rose-100 to-pink-100 p-4 rounded-lg text-center shadow-inner">
+              <div className="text-xl sm:text-2xl font-bold text-rose-800">
                 ค่าขนส่งทั้งหมด:{" "}
-                <span className="text-pink-600 bg-white px-2 py-1 rounded-md inline-block mt-2 sm:mt-0">
+                <span className="text-rose-600 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-lg inline-block mt-2 sm:mt-0 shadow-sm">
                   {calculationResult.shippingCost.toLocaleString("th-TH", {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2,
@@ -723,31 +589,10 @@ function App() {
                 </span>
               </div>
               <div className="text-sm text-gray-600 mt-2">
-                <span className="bg-yellow-50 px-2 py-1 rounded-full inline-block">
+                <span className="bg-yellow-50 px-3 py-1 rounded-full inline-block shadow-sm">
                   ราคานี้ยังไม่รวมภาษีมูลค่าเพิ่ม 7%
                 </span>
               </div>
-            </div>
-
-            <div className="mt-4 text-sm text-gray-600 text-center bg-blue-50 p-2 rounded-md">
-              <span className="flex items-center justify-center">
-                <svg
-                  className="w-4 h-4 mr-1 text-blue-500"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                  ></path>
-                </svg>
-                หมายเหตุ: ราคาอาจมีการเปลี่ยนแปลงตามสถานการณ์
-                กรุณาติดต่อเจ้าหน้าที่เพื่อยืนยันราคาอีกครั้ง
-              </span>
             </div>
           </div>
         )}
