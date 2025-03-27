@@ -94,16 +94,31 @@ function App() {
     setCustomRates({ ...customRates, [type]: value });
   };
 
+  // เพิ่มฟังก์ชันสำหรับจัดการการเปลี่ยนแปลงค่า weight
+  const handleWeightChange = (e) => {
+    const value = e.target.value;
+    // ตรวจสอบว่าค่าที่กรอกเป็นตัวเลขหรือไม่ และไม่ให้มีทศนิยมมากกว่า 2 ตำแหน่ง
+    if (value === "" || /^\d*\.?\d{0,2}$/.test(value)) {
+      setWeight(value);
+    }
+  };
+
   const handleCalculate = () => {
-    // Convert dimensions to numbers
-    const width = parseFloat(dimensions.width);
-    const length = parseFloat(dimensions.length);
-    const height = parseFloat(dimensions.height);
-    const weightValue = parseFloat(weight);
+    // Convert dimensions to numbers and ensure they are positive
+    const width = Math.abs(parseFloat(dimensions.width));
+    const length = Math.abs(parseFloat(dimensions.length));
+    const height = Math.abs(parseFloat(dimensions.height));
+    const weightValue = Math.abs(parseFloat(weight));
 
     // Validation - เปลี่ยนจาก alert เป็นใช้ modal
     if (isNaN(width) || isNaN(length) || isNaN(height) || isNaN(weightValue)) {
       showErrorModal("กรุณากรอกข้อมูลให้ครบถ้วน");
+      return;
+    }
+
+    // เพิ่มการตรวจสอบค่าน้ำหนักและขนาด
+    if (weightValue <= 0 || width <= 0 || length <= 0 || height <= 0) {
+      showErrorModal("กรุณากรอกค่าน้ำหนักและขนาดให้มากกว่า 0");
       return;
     }
 
@@ -114,8 +129,8 @@ function App() {
       rates = pricingRates[customerLevel][shippingMethod][productType];
     } else {
       // Custom rates from user input
-      const perKgRate = parseFloat(customRates.perKg);
-      const perCbmRate = parseFloat(customRates.perCbm);
+      const perKgRate = Math.abs(parseFloat(customRates.perKg));
+      const perCbmRate = Math.abs(parseFloat(customRates.perCbm));
 
       if (isNaN(perKgRate) || isNaN(perCbmRate)) {
         showErrorModal("กรุณากรอกอัตราค่าขนส่งให้ครบถ้วน");
@@ -137,24 +152,33 @@ function App() {
     // Determine which calculation to use
     if (volumeWeight < weightValue) {
       // Use actual weight calculation
-      shippingCost = weightValue * rates.perKg;
-      if (weightValue <= 1) {
+      if (weightValue < 1) {
         shippingCost = rates.perKg;
+      } else {
+        shippingCost = weightValue * rates.perKg;
       }
       calcType = "weight";
     } else {
       // Use volume calculation
       const cubicMeters = (width * length * height) / 1000000;
-      shippingCost = cubicMeters * rates.perCbm;
+      if (cubicMeters < 1) {
+        shippingCost = rates.perCbm;
+      } else {
+        shippingCost = cubicMeters * rates.perCbm;
+      }
       calcType = "volume";
     }
 
     setCalculationResult({
-      volumeWeight,
-      actualWeight: weightValue,
+      volumeWeight: parseFloat(volumeWeight.toFixed(2)),
+      actualWeight: parseFloat(weightValue.toFixed(2)),
       shippingCost: parseFloat(shippingCost.toFixed(2)),
-      calculationType: calcType, // ใช้ตัวแปรใหม่
-      dimensions: { width, length, height },
+      calculationType: calcType,
+      dimensions: { 
+        width: parseFloat(width.toFixed(2)), 
+        length: parseFloat(length.toFixed(2)), 
+        height: parseFloat(height.toFixed(2)) 
+      },
       customerLevel: calculationType === "company" ? customerLevel : "N/A",
       productType: calculationType === "company" ? productType : "N/A",
       shippingMethod: calculationType === "company" ? shippingMethod : "N/A",
@@ -220,10 +244,19 @@ function App() {
             </label>
             <input
               type="number"
+              min="0"
+              step="0.01"
               className="w-full p-2 sm:p-3 rounded-lg border border-rose-200 focus:ring-2 focus:ring-rose-300 focus:border-rose-500 outline-none transition-all"
               placeholder="น้ำหนัก"
               value={weight}
-              onChange={(e) => setWeight(e.target.value)}
+              onChange={handleWeightChange}
+              onBlur={(e) => {
+                // เมื่อออกจาก input ให้ปัดเศษทศนิยมให้เหลือ 2 ตำแหน่ง
+                const value = e.target.value;
+                if (value !== "") {
+                  setWeight(parseFloat(value).toFixed(2));
+                }
+              }}
             />
           </div>
         </div>
