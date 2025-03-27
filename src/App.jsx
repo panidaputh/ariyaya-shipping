@@ -254,9 +254,9 @@ function App() {
         {/* เปลี่ยนส่วนเลือกรูปแบบการคำนวณจาก dropdown เป็น radio */}
         <div className="bg-white/60 backdrop-blur-sm p-4 sm:p-6 rounded-xl mb-6 shadow-lg border border-rose-100">
           <h2 className="text-lg sm:text-xl font-semibold mb-4 text-rose-800">
-            <span className="inline-block mr-2">🔄</span>รูปแบบการคำนวณ
+            <span className="inline-block mr-2">🔁</span>รูปแบบการคำนวณ
           </h2>
-          <div className="flex flex-col sm:flex-row gap-4">
+          <div className="flex flex-col sm:flex-row gap-2">
             <label className="flex items-center space-x-2 cursor-pointer p-3 rounded-lg hover:bg-rose-50 transition-colors">
               <input
                 type="radio"
@@ -265,7 +265,7 @@ function App() {
                 onChange={(e) => setCalculationType(e.target.value)}
                 className="w-4 h-4 text-rose-600 border-rose-300 focus:ring-rose-500"
               />
-              <span className="text-gray-700">คำนวณด้วยเรทของบริษัท</span>
+              <span className="text-gray-700">คำนวณด้วยเรทค่าขนส่งของทางบริษัท</span>
             </label>
             <label className="flex items-center space-x-2 cursor-pointer p-3 rounded-lg hover:bg-rose-50 transition-colors">
               <input
@@ -275,7 +275,7 @@ function App() {
                 onChange={(e) => setCalculationType(e.target.value)}
                 className="w-4 h-4 text-rose-600 border-rose-300 focus:ring-rose-500"
               />
-              <span className="text-gray-700">คำนวณด้วยเรทที่กำหนดเอง</span>
+              <span className="text-gray-700">คำนวณด้วยเรทค่าขนส่งที่กำหนดเอง</span>
             </label>
           </div>
         </div>
@@ -292,7 +292,7 @@ function App() {
           >
             <div className="bg-gray-50 p-4 sm:p-6 rounded-lg shadow-sm">
               <h3 className="text-lg font-semibold mb-4 text-gray-800">
-                <span className="inline-block mr-2">🏢</span>
+                <span className="inline-block mr-2">🏬</span>
                 ข้อมูลการคำนวณด้วยเรทของบริษัท
               </h3>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -335,7 +335,7 @@ function App() {
                 {/* Shipping method */}
                 <div>
                   <label className="text-base font-medium text-gray-700 block mb-2">
-                    <span className="inline-block mr-2">🚢</span>การขนส่ง
+                    <span className="inline-block mr-2">🚢🚚</span>การขนส่ง
                   </label>
                   <select
                     className="w-full p-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-300 focus:border-purple-500 outline-none bg-white"
@@ -361,13 +361,13 @@ function App() {
           >
             <div className="bg-gray-50 p-4 sm:p-6 rounded-lg shadow-sm">
               <h3 className="text-lg font-semibold mb-4 text-gray-800">
-                <span className="inline-block mr-2">📝</span>
+                <span className="inline-block mr-2">🏣</span>
                 ข้อมูลการคำนวณด้วยเรทที่กำหนดเอง
               </h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="text-base font-medium text-gray-700 block mb-2">
-                    <span className="inline-block mr-2">⚖️</span>เรทค่าขนส่ง :
+                    <span className="inline-block mr-2"></span>เรทค่าขนส่ง :
                     กก.
                   </label>
                   <input
@@ -383,7 +383,7 @@ function App() {
                 </div>
                 <div>
                   <label className="text-base font-medium text-gray-700 block mb-2">
-                    <span className="inline-block mr-2">📊</span>เรทค่าขนส่ง :
+                    <span className="inline-block mr-2"></span>เรทค่าขนส่ง :
                     คิว
                   </label>
                   <input
@@ -512,7 +512,7 @@ function App() {
                     น้ำหนักตามปริมาตร:
                   </span>
                   <span className="text-gray-800 ml-6">
-                    {calculationResult.volumeWeight.toFixed(2)} กก.
+                    {calculationResult.volumeWeight.toFixed(2)}
                   </span>
                 </div>
 
@@ -525,8 +525,8 @@ function App() {
                   </span>
                   <span className="text-gray-800 ml-6">
                     {calculationResult.calculationType === "weight"
-                      ? "คำนวณจากน้ำหนัก"
-                      : "คำนวณจากปริมาตร"}
+                      ? "คิดค่าขนส่งจากน้ำหนัก"
+                      : "คิดค่าขนส่งจากขนาด"}
                   </span>
                 </div>
               </div>
@@ -580,7 +580,7 @@ function App() {
                       ประเภทการคำนวณ:
                     </span>
                     <span className="text-gray-800 ml-6">
-                      คำนวณด้วยอัตราที่กำหนดเอง
+                      คำนวณด้วยอัตราค่าขนส่งที่กำหนดเอง
                     </span>
                   </div>
                 )}
@@ -639,7 +639,7 @@ function App() {
             </svg>
             ข้อมูลการคำนวณ
           </h3>
-          <ul className="space-y-2 text-gray-700">
+          <ul className="space-y-4 text-gray-700">
             <li className="flex items-start">
               <svg
                 className="w-5 h-5 text-blue-500 mr-2 mt-0.5 flex-shrink-0"
@@ -655,7 +655,7 @@ function App() {
                   d="M9 5l7 7-7 7"
                 ></path>
               </svg>
-              <span>คำนวณจาก (กว้าง × ยาว × สูง) ÷ 10000</span>
+              <span>บริษัทมีวิธีคิดค่าขนส่งตามขนาดและน้ำหนักสินค้า โดยคิดตามจริงไม่มีการปัดเศษ</span>
             </li>
             <li className="flex items-start">
               <svg
@@ -672,9 +672,10 @@ function App() {
                   d="M9 5l7 7-7 7"
                 ></path>
               </svg>
-              <span>
-                การคิดค่าขนส่งจะใช้ค่าที่มากกว่าระหว่างน้ำหนักจริงและน้ำหนักตามปริมาตร
-              </span>
+              <div>
+                <span className="block mb-1">น้ำหนักเชิงปริมาตร มากกว่า น้ำหนัก สินค้าชิ้นนั้น ๆ จะถูกคิดเป็น คิว</span>
+                <span className="block mb-1 text-base text-sky-700">- คิดแบบปริมาตร กว้าง * ยาว * สูง (ซม.) / 1,000,000 = ผลลัพธ์ * อัตราค่าขนส่ง (คิว)</span>
+              </div>
             </li>
             <li className="flex items-start">
               <svg
@@ -691,29 +692,10 @@ function App() {
                   d="M9 5l7 7-7 7"
                 ></path>
               </svg>
-              <span>
-                ราคาต่อกิโลกรัมใช้ในกรณีที่น้ำหนักจริงมากกว่าน้ำหนักตามปริมาตร
-              </span>
-            </li>
-            <li className="flex items-start">
-              <svg
-                className="w-5 h-5 text-blue-500 mr-2 mt-0.5 flex-shrink-0"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M9 5l7 7-7 7"
-                ></path>
-              </svg>
-              <span>
-                ราคาต่อคิวใช้ในกรณีที่น้ำหนักตามปริมาตรมากกว่าน้ำหนักจริง (1 คิว
-                = 1 ลูกบาศก์เมตร)
-              </span>
+              <div>
+                <span className="block mb-1">น้ำหนักเชิงปริมาตร น้อยกว่า น้ำหนัก สินค้าชิ้นนั้น ๆ จะถูกคิดเป็น กิโลกรัม</span>
+                <span className="block mb-1 text-base text-sky-700">- คิดแบบน้ำหนัก น้ำหนักจริง * อัตราค่าขนส่ง (กก.)</span>
+              </div>
             </li>
           </ul>
         </div>
