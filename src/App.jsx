@@ -108,7 +108,7 @@ function App() {
     const width = Math.abs(parseFloat(dimensions.width));
     const length = Math.abs(parseFloat(dimensions.length));
     const height = Math.abs(parseFloat(dimensions.height));
-    const weightValue = Math.abs(parseFloat(weight));
+    const weightValue = parseFloat(weight);
 
     // Validation - เปลี่ยนจาก alert เป็นใช้ modal
     if (isNaN(width) || isNaN(length) || isNaN(height) || isNaN(weightValue)) {
@@ -147,31 +147,23 @@ function App() {
     const volumeWeight = (width * length * height) / 5000;
 
     let shippingCost = 0;
-    let calcType = ""; // เปลี่ยนชื่อตัวแปรเพื่อไม่ให้ชนกับ state calculationType
+    let calcType = "";
 
     // Determine which calculation to use
     if (volumeWeight < weightValue) {
       // Use actual weight calculation
-      if (weightValue < 1) {
-        shippingCost = rates.perKg;
-      } else {
-        shippingCost = weightValue * rates.perKg;
-      }
+      shippingCost = weightValue * rates.perKg;
       calcType = "weight";
     } else {
       // Use volume calculation
       const cubicMeters = (width * length * height) / 1000000;
-      if (cubicMeters < 1) {
-        shippingCost = rates.perCbm;
-      } else {
-        shippingCost = cubicMeters * rates.perCbm;
-      }
+      shippingCost = cubicMeters * rates.perCbm;
       calcType = "volume";
     }
 
     setCalculationResult({
-      volumeWeight: parseFloat(volumeWeight.toFixed(2)),
-      actualWeight: parseFloat(weightValue.toFixed(2)),
+      volumeWeight: parseFloat(volumeWeight.toFixed(3)),
+      actualWeight: weightValue,
       shippingCost: parseFloat(shippingCost.toFixed(2)),
       calculationType: calcType,
       dimensions: { 
@@ -213,7 +205,7 @@ function App() {
 
             <div className="flex flex-wrap items-center gap-2 mb-4">
               <input
-                type="number"
+                type="text"
                 className="flex-1 min-w-[80px] p-2 sm:p-3 rounded-lg border border-rose-200 focus:ring-2 focus:ring-rose-300 focus:border-rose-500 outline-none transition-all"
                 placeholder="กว้าง"
                 value={dimensions.width}
@@ -221,7 +213,7 @@ function App() {
               />
               <span className="text-rose-600 font-bold">×</span>
               <input
-                type="number"
+                type="text"
                 className="flex-1 min-w-[80px] p-2 sm:p-3 rounded-lg border border-rose-200 focus:ring-2 focus:ring-rose-300 focus:border-rose-500 outline-none transition-all"
                 placeholder="ยาว"
                 value={dimensions.length}
@@ -229,7 +221,7 @@ function App() {
               />
               <span className="text-rose-600 font-bold">×</span>
               <input
-                type="number"
+                type="text"
                 className="flex-1 min-w-[80px] p-2 sm:p-3 rounded-lg border border-rose-200 focus:ring-2 focus:ring-rose-300 focus:border-rose-500 outline-none transition-all"
                 placeholder="สูง"
                 value={dimensions.height}
@@ -243,9 +235,7 @@ function App() {
               น้ำหนัก : กก.
             </label>
             <input
-              type="number"
-              min="0"
-              step="0.01"
+              type="text"
               className="w-full p-2 sm:p-3 rounded-lg border border-rose-200 focus:ring-2 focus:ring-rose-300 focus:border-rose-500 outline-none transition-all"
               placeholder="น้ำหนัก"
               value={weight}
