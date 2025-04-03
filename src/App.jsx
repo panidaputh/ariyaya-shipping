@@ -210,6 +210,8 @@ function App() {
                 placeholder="กว้าง"
                 value={dimensions.width}
                 onChange={(e) => handleDimensionChange("width", e.target.value)}
+                inputMode="numeric"
+                pattern="[0-9]*"
               />
               <span className="text-rose-600 font-bold">×</span>
               <input
@@ -218,6 +220,8 @@ function App() {
                 placeholder="ยาว"
                 value={dimensions.length}
                 onChange={(e) => handleDimensionChange("length", e.target.value)}
+                inputMode="numeric"
+                pattern="[0-9]*"
               />
               <span className="text-rose-600 font-bold">×</span>
               <input
@@ -226,6 +230,8 @@ function App() {
                 placeholder="สูง"
                 value={dimensions.height}
                 onChange={(e) => handleDimensionChange("height", e.target.value)}
+                inputMode="numeric"
+                pattern="[0-9]*"
               />
             </div>
           </div>
@@ -247,6 +253,8 @@ function App() {
                   setWeight(parseFloat(value).toFixed(2));
                 }
               }}
+              inputMode="numeric"
+              pattern="[0-9]*"
             />
           </div>
         </div>
