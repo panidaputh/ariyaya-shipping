@@ -379,13 +379,15 @@ function App() {
                     กก.
                   </label>
                   <input
-                    type="number"
+                    type="text"
                     className="w-full p-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-300 focus:border-purple-500 outline-none"
                     placeholder="บาท/กก."
                     value={customRates.perKg}
                     onChange={(e) =>
                       handleCustomRateChange("perKg", e.target.value)
                     }
+                    inputMode="numeric"
+                    pattern="[0-9]*"
                     disabled={calculationType === "company"}
                   />
                 </div>
@@ -395,13 +397,13 @@ function App() {
                     คิว
                   </label>
                   <input
-                    type="number"
+                    type="text"
                     className="w-full p-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-300 focus:border-purple-500 outline-none"
                     placeholder="บาท/คิว"
                     value={customRates.perCbm}
-                    onChange={(e) =>
-                      handleCustomRateChange("perCbm", e.target.value)
-                    }
+                    onChange={(e) => handleCustomRateChange("perCbm", e.target.value)}
+                    inputMode="numeric"
+                    pattern="[0-9]*"
                     disabled={calculationType === "company"}
                   />
                 </div>
